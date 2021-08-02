@@ -1,0 +1,14 @@
+name: GEQuests
+version: ${project.version}
+main: me.frostingly.gequests.GEQuests
+api-version: 1.16
+authors: [ Frostingly ]
+
+softdepend: [GERankup, GEBalance, WorldGuard, WorldGuardEvents]
+
+commands:
+  gequests:
+    description: Main command.
+  startquest:
+  cancelquest:
+  abandonquest:

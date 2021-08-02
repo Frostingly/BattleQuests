@@ -1,0 +1,38 @@
+Credit(s): "Frostingly™#6666 on Discord"
+
+# Current available quest types: Mining, Hunting, Fishing, Speaking to an npc, brewing a potion, crafting an item, dropping an item
+
+root: "Quests" # directory which will hold all NPCs and Quests, note a bad configured addon may stop working after changing this value.
+
+messages:
+  no_permission:  "&cYou do not have permission to start this quest."
+  quest_already_started: "&fYou have already started the quest &6<quest>&f."
+  quest_finished: "&6&lWOOHOO! &fYou have finished quest &6<quest>&f."
+  quest_started: "&fYou have started quest &6<quest>&f."
+  quest_cancelled: "&cYou have canceled the quest."
+  quest_dialogue_out_of_time: "&cYou have ran out of time to interact with the dialogue, try again by starting another quest!"
+  quest_abandoned: "&aYou have abandoned your quest &6<quest>."
+  no_quest_active: "&cYou don't have an active quest."
+  no_prev_quests_found: "&cYou have not completed a quest before, please complete at least 1 quest."
+
+commands:
+  reloadCMD:
+    permission: gequests.reload
+    no_permission: "&cNo permission to use this command."
+
+sectionLol:
+  1stBranchQuest:
+    neededSupplies:
+      1:
+        material: COAL_BLOCK
+        amount: 256
+  2ndBranchQuest:
+    neededSupplies:
+      1:
+        material: EMERALD_BLOCK
+        amount: 16
+  3rdBranchQuest:
+    neededSupplies:
+      1:
+        material: STONE
+        amount: 1
