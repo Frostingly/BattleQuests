@@ -14,9 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class GatheringBranchPhaseQuest {
 
@@ -48,25 +46,29 @@ public class GatheringBranchPhaseQuest {
                         if (playerData.getQuest() != null) {
                             if (playerData.getQuest().isQuestActive()) {
                                 FileConfiguration questConfig = playerData.getQuest().getQuestConfig();
+                                Map<Object, List<ItemStack>> supplies = new HashMap<>();
                                 Integer id = playerData.getPhaseQuestID();
                                 ConfigurationSection branchQuestSection = questConfig.getConfigurationSection("quest.branchQuests");
-                                if (branchQuestSection != null)  {
-                                    if (questConfig.getInt("quest.maxBranchQuests") == 1) {
-                                        if (branchQuestSection.getString(".1stBranchQuest.type").equalsIgnoreCase("Phase")) {
-                                            if (id <= branchQuestSection.getInt(".1stBranchQuest.maxPhaseQuests")) {
-                                                if (branchQuestSection.getString(".1stBranchQuest.phaseQuests." + id + ".type").equalsIgnoreCase("Gathering")) {
-                                                    ConfigurationSection phaseSection = branchQuestSection.getConfigurationSection(".1stBranchQuest.phaseQuests." + id);
+                                if (questConfig.contains("quest.branchQuests")) {
+                                    branchQuestSection.getKeys(false).forEach(branchID -> {
+                                        if (branchQuestSection.getString(branchID + ".type").equalsIgnoreCase("Phase")) {
+                                            List<Integer> availablePhaseQuestsAmount = new ArrayList<>();
+                                            availablePhaseQuestsAmount.add(branchQuestSection.getConfigurationSection(branchID + ".phaseQuests").getKeys(false).size());
+                                            if (id <= availablePhaseQuestsAmount.size()) {
+                                                ConfigurationSection phaseSection = branchQuestSection.getConfigurationSection(branchID + ".phaseQuests." + id);
+                                                if (phaseSection.getString(".type").equalsIgnoreCase("Gathering")) {
                                                     ConfigurationSection supplySection = phaseSection.getConfigurationSection(".neededSupplies");
-                                                    List<ItemStack> supplies = new ArrayList<>();
+                                                    List<ItemStack> suppliesList = new ArrayList<>();
                                                     supplySection.getKeys(false).forEach(supplyID -> {
-                                                        Material material = Material.getMaterial(supplySection.getString(supplyID + ".material"));
+                                                        Material material = Material.valueOf(supplySection.getString(supplyID + ".material"));
                                                         int amount = supplySection.getInt(supplyID + ".amount");
                                                         ItemStack itemStack = new ItemStack(material, amount);
-                                                        supplies.add(itemStack);
+                                                        suppliesList.add(itemStack);
                                                     });
+                                                    supplies.put(branchID, suppliesList);
 
                                                     boolean hasEnough = true;
-                                                    for (ItemStack itemStack : supplies) {
+                                                    for (ItemStack itemStack : supplies.get(branchID)) {
                                                         if (!p.getInventory().containsAtLeast(itemStack, itemStack.getAmount())) {
                                                             hasEnough = false;
                                                         }
@@ -74,7 +76,7 @@ public class GatheringBranchPhaseQuest {
 
                                                     if (hasEnough) {
                                                         boolean complete = true;
-                                                        for (ItemStack itemStack : supplies) {
+                                                        for (ItemStack itemStack : supplies.get(branchID)) {
                                                             if (p.getInventory().containsAtLeast(itemStack, itemStack.getAmount())) {
                                                                 p.getInventory().removeItem(itemStack);
                                                                 p.updateInventory();
@@ -83,7 +85,7 @@ public class GatheringBranchPhaseQuest {
                                                             }
                                                         }
                                                         if (complete) {
-                                                            if (phaseSection.getConfigurationSection(".rewards") != null) {
+                                                            if (phaseSection.contains(".rewards")) {
                                                                 phaseSection.getStringList(".rewards").forEach(reward -> {
                                                                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderAPI.setPlaceholders(p, reward));
                                                                 });
@@ -94,24 +96,32 @@ public class GatheringBranchPhaseQuest {
                                                     }
                                                 }
                                             } else {
-                                                Date date = new Date();
-                                                playerData.getQuest().setQuestCompletedDate(date);
-                                                if (playerData.getPrevQuests().size() == 0) {
-                                                    List<QuestData> prevQuests = new ArrayList<>();
-                                                    prevQuests.add(playerData.getQuest());
-                                                    plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
-                                                } else {
-                                                    List<QuestData> prevQuests = plugin.getPlayerData().get(p.getUniqueId()).getPrevQuests();
-                                                    prevQuests.add(playerData.getQuest());
-                                                    plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                                if (!playerData.isExecuted()) {
+                                                    playerData.setExecuted(true);
+                                                    Date date = new Date();
+                                                    playerData.getQuest().setQuestCompletedDate(date);
+                                                    if (playerData.getPrevQuests().size() == 0) {
+                                                        List<QuestData> prevQuests = new ArrayList<>();
+                                                        prevQuests.add(playerData.getQuest());
+                                                        plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                                    } else {
+                                                        List<QuestData> prevQuests = plugin.getPlayerData().get(p.getUniqueId()).getPrevQuests();
+                                                        prevQuests.add(playerData.getQuest());
+                                                        plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                                    }
+                                                    new QuestFinished().sendQuestFinished(p);
+                                                    playerData.setQuest(null);
+                                                    playerData.setPhaseQuestID(0);
+                                                    new BukkitRunnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            playerData.setExecuted(false);
+                                                        }
+                                                    }.runTaskLater(plugin, 20L);
                                                 }
-                                                playerData.setPhaseQuestID(playerData.getPhaseQuestID() + 1);
-                                                new QuestFinished().sendQuestFinished(p);
-                                                playerData.setQuest(null);
-                                                playerData.setPhaseQuestID(0);
                                             }
                                         }
-                                    }
+                                    });
                                 }
                             }
                         }

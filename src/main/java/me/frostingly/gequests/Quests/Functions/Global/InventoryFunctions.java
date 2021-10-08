@@ -31,7 +31,6 @@ public class InventoryFunctions {
         }
         for (QuestData quest : plugin.getQuests()) {
             if (quest.getQuestNPCName().equalsIgnoreCase(npcName)) {
-                PlayerData playerData = plugin.getPlayerData().get(p.getUniqueId());
                 FileConfiguration questConfig = quest.getQuestConfig();
                 if (questConfig.getString("quest.material") != null)
                     quest.setQuestMaterial(Material.valueOf(questConfig.getString("quest.material")));
@@ -41,12 +40,18 @@ public class InventoryFunctions {
                 List<String> lore = new ArrayList<>();
                 if (questConfig.getString("quest.permission") != null) {
                     if (p.hasPermission(questConfig.getString("quest.permission"))) {
-                        lore.addAll(questConfig.getStringList("quest.lore.withPermission"));
+                        if (questConfig.getStringList("quest.lore.withPermission") != null) {
+                            lore.addAll(questConfig.getStringList("quest.lore.withPermission"));
+                        }
                     } else {
-                        lore.addAll(questConfig.getStringList("quest.lore.withoutPermission"));
+                        if (questConfig.getStringList("quest.lore.withoutPermission") != null) {
+                            lore.addAll(questConfig.getStringList("quest.lore.withoutPermission"));
+                        }
                     }
                 } else {
-                    lore.addAll(questConfig.getStringList("quest.lore.defaultLore"));
+                    if (questConfig.getStringList("quest.lore.withoutPermission") != null) {
+                        lore.addAll(questConfig.getStringList("quest.lore.withoutPermission"));
+                    }
                 }
                 itemMeta.setDisplayName(Utilities.format(questConfig.getString("quest.name")));
                 itemMeta.setLore(Utilities.formatList(lore));

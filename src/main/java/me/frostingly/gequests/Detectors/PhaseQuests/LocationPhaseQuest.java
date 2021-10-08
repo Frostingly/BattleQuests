@@ -3,6 +3,7 @@ package me.frostingly.gequests.Detectors.PhaseQuests;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.frostingly.gequests.GEQuests;
 import me.frostingly.gequests.Information.Data.PlayerData;
+import me.frostingly.gequests.Information.Data.QuestData;
 import me.frostingly.gequests.Information.QuestData.LocationQuestData;
 import me.frostingly.gequests.Quests.API.Messages.QuestFinished;
 import me.frostingly.gequests.Utilities;
@@ -15,11 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LocationPhaseQuest implements Listener {
 
@@ -83,11 +82,11 @@ public class LocationPhaseQuest implements Listener {
                                                 playerData.getLocationQuestData().getLocationsToGo().put(id, locationsToGo);
                                             });
                                         }
-                                        for (Location key : playerData.getLocationQuestData().getLocationsToGo().get(1).keySet()) {
+                                        for (Location key : playerData.getLocationQuestData().getLocationsToGo().get(id).keySet()) {
                                             if ((int) playerX == key.getX() && (int) playerY == key.getY() && (int) playerZ == key.getZ() && p.getLocation().getWorld().getName().equalsIgnoreCase(key.getWorld().getName())) {
                                                 if (!Utilities.isEqualMap(playerData.getLocationQuestData().getLocationsToGo(), 0)) {
-                                                    if (playerData.getLocationQuestData().getLocationsToGo().get(1).get(key) > 0) {
-                                                        playerData.getLocationQuestData().getLocationsToGo().get(1).replace(key, (playerData.getLocationQuestData().getLocationsToGo().get(1).get(key) - 1));
+                                                    if (playerData.getLocationQuestData().getLocationsToGo().get(id).get(key) > 0) {
+                                                        playerData.getLocationQuestData().getLocationsToGo().get(id).replace(key, (playerData.getLocationQuestData().getLocationsToGo().get(id).get(key) - 1));
                                                     }
                                                 }
                                             }
@@ -107,9 +106,29 @@ public class LocationPhaseQuest implements Listener {
                                 }
                             }
                         } else {
-                            new QuestFinished().sendQuestFinished(p);
-                            playerData.setQuest(null);
-                            playerData.setPhaseQuestID(0);
+                            if (!playerData.isExecuted()) {
+                                playerData.setExecuted(true);
+                                Date date = new Date();
+                                playerData.getQuest().setQuestCompletedDate(date);
+                                if (playerData.getPrevQuests().size() == 0) {
+                                    List<QuestData> prevQuests = new ArrayList<>();
+                                    prevQuests.add(playerData.getQuest());
+                                    plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                } else {
+                                    List<QuestData> prevQuests = plugin.getPlayerData().get(p.getUniqueId()).getPrevQuests();
+                                    prevQuests.add(playerData.getQuest());
+                                    plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                }
+                                new QuestFinished().sendQuestFinished(p);
+                                playerData.setQuest(null);
+                                playerData.setPhaseQuestID(0);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        playerData.setExecuted(false);
+                                    }
+                                }.runTaskLater(plugin, 20L);
+                            }
                         }
                     }
                 }
@@ -140,7 +159,7 @@ public class LocationPhaseQuest implements Listener {
                                         playerData.setLocationQuestData(newLocationQuestData);
                                     }
                                     if (playerData.getLocationQuestData().getRegionsToGo() == null || playerData.getLocationQuestData().getRegionsToGo().get(id) == null) {
-                                        ConfigurationSection regionSection = questConfig.getConfigurationSection("quest.neededRegions");
+                                        ConfigurationSection regionSection = phaseSection.getConfigurationSection(id + ".neededRegions");
                                         regionSection.getKeys(false).forEach(regionID -> {
                                             String regionName = regionSection.getString(regionID + ".region");
                                             int amount = regionSection.getInt(regionID + ".amount");
@@ -173,9 +192,29 @@ public class LocationPhaseQuest implements Listener {
                             }
                         }
                     } else {
-                        new QuestFinished().sendQuestFinished(p);
-                        playerData.setQuest(null);
-                        playerData.setPhaseQuestID(0);
+                        if (!playerData.isExecuted()) {
+                            playerData.setExecuted(true);
+                            Date date = new Date();
+                            playerData.getQuest().setQuestCompletedDate(date);
+                            if (playerData.getPrevQuests().size() == 0) {
+                                List<QuestData> prevQuests = new ArrayList<>();
+                                prevQuests.add(playerData.getQuest());
+                                plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                            } else {
+                                List<QuestData> prevQuests = plugin.getPlayerData().get(p.getUniqueId()).getPrevQuests();
+                                prevQuests.add(playerData.getQuest());
+                                plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                            }
+                            new QuestFinished().sendQuestFinished(p);
+                            playerData.setQuest(null);
+                            playerData.setPhaseQuestID(0);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    playerData.setExecuted(false);
+                                }
+                            }.runTaskLater(plugin, 20L);
+                        }
                     }
                 }
             }

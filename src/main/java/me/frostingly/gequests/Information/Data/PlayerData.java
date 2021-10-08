@@ -30,6 +30,8 @@ public class PlayerData {
     private Map<Integer, QuestMenu> questMenuInventories = new HashMap<>();
     private Map<Integer, QuestLogMenu> questLogMenuInventories = new HashMap<>();
 
+    private boolean isExecuted = false;
+
     //Quest Data below
 
     private MiningQuestData miningQuestData;
@@ -144,6 +146,14 @@ public class PlayerData {
 
     public void setQuestLogMenuInventories(Map<Integer, QuestLogMenu> questLogMenuInventories) {
         this.questLogMenuInventories = questLogMenuInventories;
+    }
+
+    public boolean isExecuted() {
+        return isExecuted;
+    }
+
+    public void setExecuted(boolean executed) {
+        isExecuted = executed;
     }
 
     public MiningQuestData getMiningQuestData() {

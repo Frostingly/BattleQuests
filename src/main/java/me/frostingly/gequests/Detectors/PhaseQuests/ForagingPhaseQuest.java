@@ -3,6 +3,7 @@ package me.frostingly.gequests.Detectors.PhaseQuests;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.frostingly.gequests.GEQuests;
 import me.frostingly.gequests.Information.Data.PlayerData;
+import me.frostingly.gequests.Information.Data.QuestData;
 import me.frostingly.gequests.Information.QuestData.ForagingQuestData;
 import me.frostingly.gequests.Quests.API.Messages.QuestFinished;
 import me.frostingly.gequests.Utilities;
@@ -14,11 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ForagingPhaseQuest implements Listener {
 
@@ -89,9 +88,29 @@ public class ForagingPhaseQuest implements Listener {
                                 }
                             }
                         } else {
-                            new QuestFinished().sendQuestFinished(p);
-                            playerData.setQuest(null);
-                            playerData.setPhaseQuestID(0);
+                            if (!playerData.isExecuted()) {
+                                playerData.setExecuted(true);
+                                Date date = new Date();
+                                playerData.getQuest().setQuestCompletedDate(date);
+                                if (playerData.getPrevQuests().size() == 0) {
+                                    List<QuestData> prevQuests = new ArrayList<>();
+                                    prevQuests.add(playerData.getQuest());
+                                    plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                } else {
+                                    List<QuestData> prevQuests = plugin.getPlayerData().get(p.getUniqueId()).getPrevQuests();
+                                    prevQuests.add(playerData.getQuest());
+                                    plugin.getPlayerData().get(p.getUniqueId()).setPrevQuests(prevQuests);
+                                }
+                                new QuestFinished().sendQuestFinished(p);
+                                playerData.setQuest(null);
+                                playerData.setPhaseQuestID(0);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        playerData.setExecuted(false);
+                                    }
+                                }.runTaskLater(plugin, 20L);
+                            }
                         }
                     }
                 }

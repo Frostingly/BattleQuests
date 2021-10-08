@@ -59,6 +59,7 @@ public class QuestLogMenu extends InventoryHandler {
                     QuestLogMenu questLogMenu = new QuestLogMenu(GEQuests.getInstance().getPlayerData().get(p.getUniqueId()).getPlayerMenuUtility(), plugin);
                     questLogMenuInventories.put(playerData.getCurrentMenuPageNum(), questLogMenu);
                     questLogMenu.open(p);
+                    p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                 }
                 break;
             case 22:
@@ -80,6 +81,7 @@ public class QuestLogMenu extends InventoryHandler {
                     }
                     playerData.setCurrentMenuPageNum(playerData.getCurrentMenuPageNum() - 1);
                     playerData.getQuestLogMenuInventories().get(playerData.getCurrentMenuPageNum()).open(p);
+                    p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                 }
                 break;
         }

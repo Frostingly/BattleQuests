@@ -1,5 +1,6 @@
 package me.frostingly.gequests;
 
+import me.frostingly.gequests.Detectors.BranchPhaseQuests.*;
 import me.frostingly.gequests.Detectors.BranchQuests.*;
 import me.frostingly.gequests.Detectors.PhaseQuests.*;
 import me.frostingly.gequests.Detectors.Regular.*;
@@ -81,12 +82,13 @@ public final class GEQuests extends JavaPlugin{
                 new GatheringQuest(getInstance()).finishQuest();
                 new GatheringBranchQuest(getInstance()).finishQuest();
                 new GatheringPhaseQuest(getInstance()).finishQuest();
-                //new GatheringBranchPhaseQuest(getInstance()).finishQuest();
+                new GatheringBranchPhaseQuest(getInstance()).finishQuest();
             }
         }.runTaskTimer(this, 0L, 40L);
     }
 
     private void loadEvents(PluginManager pm) {
+
         pm.registerEvents(new InventoryClick(this), this);
 
         pm.registerEvents(new Join(this), this);
@@ -96,30 +98,37 @@ public final class GEQuests extends JavaPlugin{
         pm.registerEvents(new LocationQuest(this), this);
         pm.registerEvents(new LocationPhaseQuest(this), this);
         pm.registerEvents(new LocationBranchQuest(this), this);
+        pm.registerEvents(new LocationBranchPhaseQuest(this), this);
 
         pm.registerEvents(new MiningQuest(this), this);
         pm.registerEvents(new MiningPhaseQuest(this), this);
         pm.registerEvents(new MiningBranchQuest(this), this);
+        pm.registerEvents(new MiningBranchPhaseQuest(this), this);
 
         pm.registerEvents(new HuntingQuest(this), this);
         pm.registerEvents(new HuntingPhaseQuest(this), this);
         pm.registerEvents(new HuntingBranchQuest(this), this);
+        pm.registerEvents(new HuntingBranchPhaseQuest(this), this);
 
         pm.registerEvents(new CraftingQuest(this), this);
         pm.registerEvents(new CraftingPhaseQuest(this), this);
         pm.registerEvents(new CraftingBranchQuest(this), this);
+        pm.registerEvents(new CraftingBranchPhaseQuest(this), this);
 
         pm.registerEvents(new FishingQuest(this), this);
         pm.registerEvents(new FishingPhaseQuest(this), this);
         pm.registerEvents(new FishingBranchQuest(this), this);
+        pm.registerEvents(new FishingBranchPhaseQuest(this), this);
 
         pm.registerEvents(new ForagingQuest(this), this);
         pm.registerEvents(new ForagingPhaseQuest(this), this);
         pm.registerEvents(new ForagingBranchQuest(this), this);
+        pm.registerEvents(new ForagingBranchPhaseQuest(this), this);
 
         pm.registerEvents(new InteractEntityQuest(this), this);
         pm.registerEvents(new InteractEntityPhaseQuest(this), this);
         pm.registerEvents(new InteractEntityBranchQuest(this), this);
+        pm.registerEvents(new InteractEntityBranchPhaseQuest(this), this);
 
         //pm.registerEvents(new TestEvent(), this);
     }

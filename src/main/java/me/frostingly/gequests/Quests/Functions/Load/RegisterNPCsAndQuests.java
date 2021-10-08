@@ -50,14 +50,6 @@ public class RegisterNPCsAndQuests {
                                         quest.setQuestActive(false);
                                         if (questConfig.getString("quest.objective") != null)
                                             quest.setQuestObjective(Utilities.format(questConfig.getString("quest.objective")));
-                                        if (questConfig.getString("quest.lore") != null) {
-                                            if (questConfig.getString("quest.lore.withPermission") != null) {
-                                                quest.setQuestLoreWP(questConfig.getStringList("quest.lore.withPermission"));
-                                            }
-                                            if (questConfig.getString("quest.lore.withoutPermission") != null) {
-                                                quest.setQuestLoreWOUTP(questConfig.getStringList("quest.lore.withoutPermission"));
-                                            }
-                                        }
                                         plugin.getQuests().add(quest);
                                         questsLoaded = questsLoaded + 1;
                                     }

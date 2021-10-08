@@ -5,6 +5,7 @@ import me.frostingly.gequests.Handlers.InventoryHandler.InventoryHandler;
 import me.frostingly.gequests.Handlers.InventoryHandler.PlayerMenuUtility;
 import me.frostingly.gequests.Information.Data.PlayerData;
 import me.frostingly.gequests.Information.Data.QuestData;
+import me.frostingly.gequests.Quests.API.Messages.NoPermission;
 import me.frostingly.gequests.Utilities;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -88,6 +89,7 @@ public class QuestMenu extends InventoryHandler {
                         questLogMenuInventories.put(1, questLogMenu);
                         playerData.setQuestLogMenuInventories(questLogMenuInventories);
                         questLogMenu.open(p);
+                        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                     } else {
                         p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
                     }
@@ -106,6 +108,7 @@ public class QuestMenu extends InventoryHandler {
                     }
                     playerData.setCurrentMenuPageNum(playerData.getCurrentMenuPageNum() - 1);
                     playerData.getQuestMenuInventories().get(playerData.getCurrentMenuPageNum()).open(p);
+                    p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                 }
                 break;
             default:
@@ -132,13 +135,10 @@ public class QuestMenu extends InventoryHandler {
                                             playerData.getQuest().setSeconds(0);
                                             plugin.sendDialogue.sendDialogue(p);
                                             plugin.getPlayerData().get(p.getUniqueId()).setDialogueOpened(true);
+                                            p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                                             p.closeInventory();
                                         } else {
-                                            if (plugin.getConfig().getString("messages.no_permission").contains("<quest>")) {
-                                                p.sendMessage(Utilities.format(plugin.getConfig().getString("messages.no_permission").replace("<quest>", quest.getQuestName())));
-                                            } else {
-                                                p.sendMessage(Utilities.format(plugin.getConfig().getString("messages.no_permission")));
-                                            }
+                                            new NoPermission().sendNoPermission(p);
                                             p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
                                             p.closeInventory();
                                         }
@@ -152,6 +152,7 @@ public class QuestMenu extends InventoryHandler {
                                         playerData.getQuest().setSeconds(0);
                                         plugin.sendDialogue.sendDialogue(p);
                                         plugin.getPlayerData().get(p.getUniqueId()).setDialogueOpened(true);
+                                        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
                                         p.closeInventory();
                                     }
                                 } else {

@@ -44,27 +44,31 @@ public class QuestLog {
 
             SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
 
-            List<String> questLore = new ArrayList<>();
-            questLore.add(" ");
-            questLore.add("&7Quest NPC name: &f" + questNPCName);
-            questLore.add("&7Quest name: &f" + questName);
-            questLore.add("&7Quest objective: &f" + questObjective);
-            questLore.add("&7Quest type: &f" + questType);
-            if (!quest.getQuestLoreWP().isEmpty() || !quest.getQuestLoreWOUTP().isEmpty()) {
+            List<String> lore = new ArrayList<>();
+            lore.add(" ");
+            lore.add("&7Quest NPC name: &f" + questNPCName);
+            lore.add("&7Quest name: &f" + questName);
+            lore.add("&7Quest objective: &f" + questObjective);
+            lore.add("&7Quest type: &f" + questType);
+            if (questConfig.getString("quest.permission") != null) {
                 if (p.hasPermission(questConfig.getString("quest.permission"))) {
-                    if (quest.getQuestLoreWP() != null) {
-                        questLore.addAll(quest.getQuestLoreWP());
+                    if (questConfig.getStringList("quest.lore.withPermission") != null) {
+                        lore.addAll(questConfig.getStringList("quest.lore.withPermission"));
                     }
                 } else {
-                    if (quest.getQuestLoreWOUTP()!= null) {
-                        questLore.addAll(quest.getQuestLoreWOUTP());
+                    if (questConfig.getStringList("quest.lore.withoutPermission") != null) {
+                        lore.addAll(questConfig.getStringList("quest.lore.withoutPermission"));
                     }
                 }
+            } else {
+                if (questConfig.getStringList("quest.lore.withoutPermission") != null) {
+                    lore.addAll(questConfig.getStringList("quest.lore.withoutPermission"));
+                }
             }
-            questLore.add(" ");
+            lore.add(" ");
             if (quest.getQuestObjective() != null)
-                questLore.add(Utilities.format("&8&o" + format.format(quest.getQuestCompletedDate())));
-            itemMeta.setLore(Utilities.formatList(questLore));
+                lore.add(Utilities.format("&8&o" + format.format(quest.getQuestCompletedDate())));
+            itemMeta.setLore(Utilities.formatList(lore));
             itemStack.setItemMeta(itemMeta);
             quests.add(itemStack);
         }
